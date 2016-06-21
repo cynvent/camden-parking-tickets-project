@@ -1,0 +1,147 @@
+---
+title: "Parking Ticket Project EDA"
+author: "MW"
+date: "21 June 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load(file="train_data.RData")
+```
+
+
+```{r}
+library(ggplot2)
+```
+
+## Camden Parking Ticket Data - EDA
+
+This is a review of the Parking Ticket Dataset 
+
+#Total Tickets issued by Year.
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Contravention_Year))
+```
+
+The overall number of parking tickets issued is pretty consistent from 2012 - 14. 2011 was the peak in overall number of tickets, however, the 2010 data is not for a full year and could have delivered similar figures to 2011.
+
+Q: Why were there more tickets issued in 2011 compared to the subsequent
+
+#Total Tickets per Month - comparing years
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Contravention_Month, fill = Contravention_Year), position = "dodge")
+```
+
+Again, this plot shows that there was a reduction number of tickets issued in after 2011.
+
+#Total Tickets - Controlled Parking Zone Areas
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Controlled.Parking.Zone.Area, fill = Contravention_Year), position = "stack")
+```
+
+CA-C is the largest CPZ in terms of tickets issued in each of the years covered by the data set. This is followed by:
+
+CA-F > CA-D > CA-H > CA-B > CA-E > CA-G
+
+At the other end, CPZs CA-Z, CA-V, CA-S and CA-N provide the smallest number of tickets.
+
+Q: What is the reasoning for the large variation in tickets - residential v commercial area? Size/location of the CPZ? Should the lower contribution CPZs be removed from the analysis?
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Controlled.Parking.Zone.Area, fill = Contravention_Year), position = "stack")
+```
+
+#Tickets by Day of Week
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Contravention_Day_of_Week))
+```
+
+Overall, Friday and Sunday are the highest and lowest aggregate days in terms of tickets issued. From the low point on Sunday, the number of tickets issued increases day after day until we reach the peak on Friday
+
+Q: What is the difference between Sunday and other days of the week?
+
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Contravention_Day_of_Week, fill = Contravention_Day_of_Week)) +
+  facet_wrap(~ Controlled.Parking.Zone.Area)
+```
+
+Plotting the facet wrap of Zones shows the variation in the weekly patterns of tickets issued. This highlights weekend peaks in CA-F, CA-F and CA-A, and weeked decreases in CA-B, CA-G, CA-Q, CA-R & CA-M.
+
+Q What are the diffeencees between these zones - commercial v retail/entertainment?
+
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Contravention_Day_of_Week, fill = Vehicle.Category), position = "fill")
+```
+
+Weekends see a reduction in the proportion of tickets issued to Large & Small Vans and other commercial type vehicles, with an increase in the proportion of tickets issued to Private Cars
+
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Controlled.Parking.Zone.Area, fill = Contravention_Day_of_Week), position = "stack")
+```
+
+
+
+#Total Tickets - Vehicle Types by Year
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Contravention_Year, fill = Vehicle.Category), position = "stack")
+```
+
+Private Vehicles are overwhelmingly the largest recipients of tickets, followed by Small Vans then Large Vans.
+
+Q: Should this review be focussed solely on these three groups?
+
+#Ticket Outcomes by Vehicle Type
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Vehicle.Category, fill = Status.Of.Case), position = "stack")
+```
+
+While the majority of tickets issued are paid, there is some variation in the proportion of tickets that are cancelled with the greatest percentage of tickets cancelled being those issued to Saloons. This, however is caveated by the small number of tickets that are issued to this Vehicle Category. As the Private Vehicle category has the largest number of Tickets, it shows the highest overall sampled of cancelled and written off outcomes, making this the best subset to review for insights in to ticket cancelletions.
+
+Buses/Coaches have the larget proportion of Outstanding tickets, perhaps due to operational practices.
+
+Motorcycles offer the largest proportion of Written Off tickets, suggesting that there is a collection issue with motorcycles.
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Vehicle.Category, fill = Status.Of.Case), position = "fill")
+```
+
+#Vehicle Origins
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Foreign.Vehicle))
+```
+
+Overall, the majority of tickets are issued to UK vehicles > 98%.
+
+```{r echo=FALSE}
+prop.table(table(train_data$Foreign.Vehicle))
+```
+
+
+```{r echo=FALSE}
+ggplot(data = train_data) +
+  geom_bar(mapping = aes(x = Foreign.Vehicle, fill = Status.Of.Case), position = "fill")
+```
+
+Of those issued to Foreign Vehicles, there is a different proportion of the outcomes, with more tickets cancelled, written off and outstanding compared with tickets issued UK Vehicles.
